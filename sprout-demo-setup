@@ -1,0 +1,193 @@
+#!/usr/bin/env php
+<?php
+/**
+ * @link      https://sprout.barrelstrengthdesign.com/
+ * @copyright Copyright (c) Barrel Strength Design LLC
+ * @license   http://sprout.barrelstrengthdesign.com/license
+ */
+
+use yii\helpers\Console;
+
+use mikehaertl\shellcommand\Command as ShellCommand;
+
+const INSTALL_PLUGINS = [
+    'sprout-seo',
+    'sprout-forms',
+    'sprout-email',
+    'sprout-import',
+    'sprout-reports',
+    'sprout-fields'
+];
+
+// Set path constants
+define('CRAFT_BASE_PATH', __DIR__);
+define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH.'/vendor');
+
+// Load Composer's autoloader
+require_once CRAFT_VENDOR_PATH.'/autoload.php';
+
+// Load the .env file Craft created
+if (file_exists(CRAFT_BASE_PATH.'/.env')) {
+    $dotEnv = new Dotenv\Dotenv(CRAFT_BASE_PATH);
+    $dotEnv->load();
+}
+
+// By default, run the setup script
+if (empty($argv[1])) {
+    setupSproutCraft();
+} else {
+    // See what command we were passed in
+    switch ($argv[1]) {
+        case 'welcome':
+            // Display a welcome message
+            welcomeToSprout();
+            break;
+
+        default:
+            // Set up all the things!
+            setupSproutCraft();
+            break;
+    }
+}
+
+/**
+ * Display a welcome message
+ */
+function welcomeToSprout()
+{
+    outputString(PHP_EOL.'To set up your Craft install, from your project directory, run:', Console::FG_YELLOW);
+    $script = './craft setup';
+    outputString(PHP_EOL.'    '.$script, Console::FG_GREEN);
+
+    outputString(PHP_EOL.'Then to set up Craft 3 with the Sprout Environment, run:', Console::FG_YELLOW);
+    $script = './sprout-demo-setup';
+    outputString(PHP_EOL.'    '.$script, Console::FG_GREEN);
+    outputString(PHP_EOL.'Your setup is not complete until you run these two commands.', Console::FG_YELLOW);
+}
+
+/**
+ * Set up all the things!
+ */
+function setupSproutCraft()
+{
+    // Say hello
+    outputString(PHP_EOL.'Welcome to sprout demo', Console::FG_YELLOW);
+    // Install the default plugins
+    installPlugins();
+    // Say goodbye
+    outputString(PHP_EOL.'Setup complete. Have a nice day!', Console::FG_YELLOW);
+}
+
+/**
+ * Install the default plugins
+ */
+function installPlugins()
+{
+    outputString(PHP_EOL.'Installing plugins', Console::FG_YELLOW);
+    $installPluginCmd = './craft install/plugin ';
+    foreach (INSTALL_PLUGINS as $pluginHandle) {
+        outputString('- installing plugin '.$pluginHandle);
+        executeShellCommand($installPluginCmd . $pluginHandle);
+    }
+}
+
+/**
+ * Output a string to the console, using optional $args to color it, if supported
+ *
+ * @param string $string
+ *
+ * @return mixed
+ */
+function outputString($string)
+{
+    $stream = \STDOUT;
+    if (Console::streamSupportsAnsiColors($stream)) {
+        $args = func_get_args();
+        array_shift($args);
+        $string = Console::ansiFormat($string, $args);
+    }
+
+    return Console::stdout($string.PHP_EOL);
+}
+
+/**
+ * Create a symlink from $srcPath to $destPath
+ *
+ * @param string $srcPath
+ * @param string $destPath
+ *
+ * @return bool
+ */
+function createSymLink(string $srcPath, string $destPath)
+{
+    $result = @symlink($srcPath, $destPath);
+    if ($result) {
+        outputString('- created symlink from '.$srcPath.' to '.$destPath);
+    } else {
+        outputString('### error creating symlink from '.$srcPath.' to '.$destPath, Console::FG_RED);
+    }
+
+    return $result;
+}
+
+/**
+ * Copy the $srcPath file to $destPath
+ *
+ * @param string $srcPath
+ * @param string $destPath
+ *
+ * @return bool
+ */
+function copyFile(string $srcPath, string $destPath)
+{
+    $result = @copy($srcPath, $destPath);
+    if ($result) {
+        outputString('- copied '.$srcPath.' to '.$destPath);
+    } else {
+        outputString('### error copying '.$srcPath.' to '.$destPath, Console::FG_RED);
+    }
+
+    return $result;
+}
+
+/**
+ * Execute a shell command
+ *
+ * @param string $command
+ *
+ * @return string
+ */
+function executeShellCommand(string $command): string
+{
+    // Create the shell command
+    $shellCommand = new ShellCommand();
+    $shellCommand->setCommand($command);
+
+    // If we don't have proc_open, maybe we've got exec
+    if (!function_exists('proc_open') && function_exists('exec')) {
+        $shellCommand->useExec = true;
+    }
+
+    // Return the result of the command's output or error
+    if ($shellCommand->execute()) {
+        $result = $shellCommand->getOutput();
+    } else {
+        $result = $shellCommand->getError();
+    }
+
+    return $result;
+}
+
+/**
+ * Return whether a shell command exists ir not
+ *
+ * @param string $command
+ *
+ * @return bool
+ */
+function shellCommandExists(string $command): bool
+{
+    $result = executeShellCommand('which '.$command);
+
+    return !empty($result);
+}
