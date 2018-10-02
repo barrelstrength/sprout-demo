@@ -23,7 +23,7 @@ const INSTALL_PLUGINS = [
         'barrelstrength/sprout-forms-countries',
         'barrelstrength/sprout-forms-range-slider',
         'barrelstrength/sprout-forms-us-states'
-    ]
+    ],
     'email' => [
         'barrelstrength/sprout-email',
     ],

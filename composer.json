@@ -38,7 +38,6 @@
     "post-create-project-cmd": [
       "@php -r \"copy('config/local/db.example.php', 'config/local/db.php');\"",
       "@php -r \"copy('config/local/general.example.php', 'config/local/general.php');\"",
-      "@php craft setup/welcome",
       "@php sprout-demo-setup welcome"
     ]
   }
