@@ -18,6 +18,7 @@
     "docs": "https://github.com/barrelstrength/craft-master",
     "forum": "https://craftcms.stackexchange.com/"
   },
+  "minimum-stability": "beta",
   "require": {
     "craftcms/cms": "^3.0.0",
     "vlucas/phpdotenv": "^2.4.0"

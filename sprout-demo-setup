@@ -11,12 +11,28 @@ use yii\helpers\Console;
 use mikehaertl\shellcommand\Command as ShellCommand;
 
 const INSTALL_PLUGINS = [
-    'sprout-seo',
-    'sprout-forms',
-    'sprout-email',
-    'sprout-import',
-    'sprout-reports',
-    'sprout-fields'
+    'basic' => [
+        'barrelstrength/sprout-seo',
+        'barrelstrength/sprout-import',
+        'barrelstrength/sprout-fields',
+        'barrelstrength/sprout-notes',
+        'barrelstrength/sprout-lists'
+    ],
+    'forms' => [
+        'barrelstrength/sprout-forms',
+        'barrelstrength/sprout-forms-countries',
+        'barrelstrength/sprout-forms-range-slider',
+        'barrelstrength/sprout-forms-us-states'
+    ]
+    'email' => [
+        'barrelstrength/sprout-email',
+    ],
+    'reports' => [
+        'barrelstrength/sprout-reports',
+        'barrelstrength/sprout-reports-categories',
+        'barrelstrength/sprout-reports-users'
+    ]
+    
 ];
 
 // Set path constants
@@ -41,6 +57,11 @@ if (empty($argv[1])) {
         case 'welcome':
             // Display a welcome message
             welcomeToSprout();
+            break;
+
+        case 'forms':
+            // Install only Forms plugins
+            installFormsPlugins();
             break;
 
         default:
@@ -84,10 +105,13 @@ function setupSproutCraft()
 function installPlugins()
 {
     outputString(PHP_EOL.'Installing plugins', Console::FG_YELLOW);
-    $installPluginCmd = './craft install/plugin ';
-    foreach (INSTALL_PLUGINS as $pluginHandle) {
-        outputString('- installing plugin '.$pluginHandle);
-        executeShellCommand($installPluginCmd . $pluginHandle);
+    $installPluginCmd = 'composer require ';
+    foreach (INSTALL_PLUGINS as $key => $plugins) {
+        outputString('- group: '.$key);
+        foreach ($plugins as $pluginHandle) {
+            outputString('------- installing plugin '.$pluginHandle);
+            executeShellCommand($installPluginCmd . $pluginHandle);
+        }    
     }
 }
 
