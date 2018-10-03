@@ -59,14 +59,9 @@ if (empty($argv[1])) {
             welcomeToSprout();
             break;
 
-        case 'forms':
-            // Install only Forms plugins
-            installFormsPlugins();
-            break;
-
         default:
             // Set up all the things!
-            setupSproutCraft();
+            setupSproutCraft($argv[1]);
             break;
     }
 }
@@ -81,20 +76,45 @@ function welcomeToSprout()
     outputString(PHP_EOL.'    '.$script, Console::FG_GREEN);
 
     outputString(PHP_EOL.'Then to set up Craft 3 with the Sprout Environment, run:', Console::FG_YELLOW);
-    $script = './sprout-demo-setup';
+    $script = 'php sprout-demo-setup';
     outputString(PHP_EOL.'    '.$script, Console::FG_GREEN);
+
+    outputString(PHP_EOL.'Available groups to install: 
+        basic:
+            barrelstrength/sprout-seo,
+            barrelstrength/sprout-import,
+            barrelstrength/sprout-fields,
+            barrelstrength/sprout-notes,
+            barrelstrength/sprout-lists
+        forms:
+            barrelstrength/sprout-forms,
+            barrelstrength/sprout-forms-countries,
+            barrelstrength/sprout-forms-range-slider,
+            barrelstrength/sprout-forms-us-states
+        email:
+            barrelstrength/sprout-email,
+        reports:
+            barrelstrength/sprout-reports,
+            barrelstrength/sprout-reports-categories,
+            barrelstrength/sprout-reports-users
+        ', Console::FG_YELLOW);
+
+    outputString(PHP_EOL.'You can choose specific groups, run:', Console::FG_YELLOW);
+    $script = 'php sprout-demo-setup forms+email';
+    outputString(PHP_EOL.'    '.$script, Console::FG_GREEN);
+
     outputString(PHP_EOL.'Your setup is not complete until you run these two commands.', Console::FG_YELLOW);
 }
 
 /**
  * Set up all the things!
  */
-function setupSproutCraft()
+function setupSproutCraft($installGroup = null)
 {
     // Say hello
     outputString(PHP_EOL.'Welcome to sprout demo', Console::FG_YELLOW);
     // Install the default plugins
-    installPlugins();
+    installPlugins($installGroup);
     // Say goodbye
     outputString(PHP_EOL.'Setup complete. Have a nice day!', Console::FG_YELLOW);
 }
@@ -102,16 +122,33 @@ function setupSproutCraft()
 /**
  * Install the default plugins
  */
-function installPlugins()
+function installPlugins($installGroup)
 {
     outputString(PHP_EOL.'Installing plugins', Console::FG_YELLOW);
     $installPluginCmd = 'composer require ';
     foreach (INSTALL_PLUGINS as $key => $plugins) {
-        outputString('- group: '.$key);
-        foreach ($plugins as $pluginHandle) {
-            outputString('------- installing plugin '.$pluginHandle);
-            executeShellCommand($installPluginCmd . $pluginHandle);
-        }    
+        // specific group
+        if (!is_null($installGroup)){
+            $groups = explode("+", $installGroup);
+
+            foreach ($groups as $group) {
+                if (trim($group) == $key){
+                    outputString('- group: '.$key);
+                    foreach ($plugins as $pluginHandle) {
+                        outputString('------- installing plugin '.$pluginHandle);
+                        executeShellCommand($installPluginCmd . $pluginHandle);
+                    }
+                    break;
+                }
+            }
+        }else{
+            outputString('- group: '.$key);
+            foreach ($plugins as $pluginHandle) {
+                outputString('------- installing plugin '.$pluginHandle);
+                executeShellCommand($installPluginCmd . $pluginHandle);
+            }   
+        }
+         
     }
 }
 
