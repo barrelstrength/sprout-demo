@@ -32,7 +32,7 @@ const INSTALL_PLUGINS = [
         'barrelstrength/sprout-reports-categories',
         'barrelstrength/sprout-reports-users'
     ]
-    
+
 ];
 
 // Set path constants
@@ -71,15 +71,23 @@ if (empty($argv[1])) {
  */
 function welcomeToSprout()
 {
+    outputString(PHP_EOL."
+   _____                        __
+  / ___/____  _________  __  __/ /_
+  \__ \/ __ \/ ___/ __ \/ / / / __/
+ ___/ / /_/ / /  / /_/ / /_/ / /_
+/____/ .___/_/   \____/\__,_/\__/
+    /_/".PHP_EOL, Console::FG_GREEN);
+
     outputString(PHP_EOL.'To set up your Craft install, from your project directory, run:', Console::FG_YELLOW);
-    $script = 'php craft setup';
+    $script = __DIR__.'/craft setup';
     outputString(PHP_EOL.'    '.$script, Console::FG_GREEN);
 
     outputString(PHP_EOL.'Then to set up Craft 3 with the Sprout Environment, run:', Console::FG_YELLOW);
-    $script = 'php sprout-demo-setup';
+    $script = 'php ./sprout-demo-setup';
     outputString(PHP_EOL.'    '.$script, Console::FG_GREEN);
 
-    outputString(PHP_EOL.'Available groups to install: 
+    outputString(PHP_EOL.'Available groups to install:
         basic:
             barrelstrength/sprout-seo,
             barrelstrength/sprout-import,
@@ -99,10 +107,8 @@ function welcomeToSprout()
             barrelstrength/sprout-reports-users', Console::FG_YELLOW);
 
     outputString(PHP_EOL.'You can choose specific groups, run:', Console::FG_YELLOW);
-    $script = 'php sprout-demo-setup forms+email';
+    $script = 'php ./sprout-demo-setup forms+email';
     outputString(PHP_EOL.'    '.$script, Console::FG_GREEN);
-
-    outputString(PHP_EOL.'Good luck. -May the Force be with you-', Console::FG_YELLOW);
 }
 
 /**
@@ -145,9 +151,9 @@ function installPlugins($installGroup)
             foreach ($plugins as $pluginHandle) {
                 outputString('------- installing plugin '.$pluginHandle);
                 executeShellCommand($installPluginCmd . $pluginHandle);
-            }   
+            }
         }
-         
+
     }
 }
 
