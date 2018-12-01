@@ -18,6 +18,7 @@
     "docs": "https://craftcms.com/docs",
     "rss": "https://craftcms.com/changelog.rss"
   },
+  "minimum-stability": "dev",
   "require": {
     "craftcms/cms": "^3.0.0",
     "vlucas/phpdotenv": "^2.4.0"
@@ -41,6 +42,7 @@
       "@php -r \"unlink('README.md');\"",
       "@php -r \"rename('composer.json.default', 'composer.json');\"",
       "@composer dump-autoload -o",
+      "@composer clear-cache",
       "@php sprout-demo-setup welcome"
     ]
   }
