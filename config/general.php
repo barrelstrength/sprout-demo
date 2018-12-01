@@ -2,69 +2,49 @@
 /**
  * General Configuration
  *
- * See configuration options:
- * vendor/craftcms/cms/src/config/GeneralConfig.php
+ * All of your system's general configuration settings go in here. You can see a
+ * list of the available settings in vendor/craftcms/cms/src/config/GeneralConfig.php.
+ *
+ * @see craft\config\GeneralConfig
  */
 
-$customConfig = [
-
-    // All Environments
+return [
+    // Global settings
     '*' => [
-        'env'     => CRAFT_ENVIRONMENT,
-        'siteUrl' => SITE_URL,
-        'aliases' => [
-            '@svg' => CRAFT_BASE_PATH . '/web/assets/svgs'
-        ],
-        'securityKey' => 'ADD_SECURITY_KEY',
+        // Default Week Start Day (0 = Sunday, 1 = Monday...)
+        'defaultWeekStartDay' => 0,
 
-        'devMode' => false,
-        'isSystemOn' => false,
-        'allowUpdates' => false,
-        'backupOnUpdate' => false,
-        'enableTemplateCaching' => false,
-        'generateTransformsBeforePageLoad' => true,
+        // Enable CSRF Protection (recommended)
+        'enableCsrfProtection' => true,
+
+        // Whether generated URLs should omit "index.php"
         'omitScriptNameInUrls' => true,
 
-        'tokenParam' => 't',
-        'defaultSearchTermOptions' => [
-            'subLeft'  => true,
-            'subRight' => true
-        ],
+        // Control Panel trigger word
+        'cpTrigger' => 'admin',
 
-        // Member login info duration
-        // http://www.php.net/manual/en/dateinterval.construct.php
-        'userSessionDuration'           => 'P1M',
-        'rememberedUserSessionDuration' => 'P1M',
-        'rememberUsernameDuration'      => 'P1M',
+        // The secure key Craft will use for hashing and encrypting data
+        'securityKey' => getenv('SECURITY_KEY'),
     ],
 
-    // Production Environment
+    // Dev environment settings
+    'dev' => [
+        // Base site URL
+        'siteUrl' => null,
+
+        // Dev Mode (see https://craftcms.com/support/dev-mode)
+        'devMode' => true,
+    ],
+
+    // Staging environment settings
+    'staging' => [
+        // Base site URL
+        'siteUrl' => null,
+    ],
+
+    // Production environment settings
     'production' => [
-        'isSystemOn' => true,
-        'enableTemplateCaching' => true
+        // Base site URL
+        'siteUrl' => null,
     ],
-
-    // Dev Environment
-    'dev'   => [
-        'isSystemOn' => false,
-        'devMode' => true,
-        'enableTemplateCaching' => false,
-    ],
-
-    // Local Environment
-    'local' => [
-        'isSystemOn' => true,
-        'allowUpdates' => true,
-        'devMode' => true,
-        'backupOnUpdate' => true,
-    ]
 ];
-
-// If a local config file exists, merge any local config settings
-if (is_array($customLocalConfig = @include(CRAFT_BASE_PATH . '/config/local/general.php')))
-{
-  $customGlobalConfig = array_merge($customConfig['*'], $customLocalConfig);
-  $customConfig['*'] = $customGlobalConfig;
-}
-
-return $customConfig;
